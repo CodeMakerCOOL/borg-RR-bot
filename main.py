@@ -10,4 +10,10 @@ def start(msg):
 
 @bot.message_handler(commands=['help'])
 def help(msg):
-    bot.send_message(msg.chat.id, "Commands\n/start - Start the bot\n/help - Get some help\n/register <account-link> - Register your RR account\n/deposit <amount> - Deposits B$ to registered account\n/withdraw <amount> - Withdraws B$ from your account and sends it as RR money to your RR account\n/balance - Shows how much B$ you have in your account")
+    bot.send_message(msg.chat.id, "Commands:"
+    "\n/start - Start the bot,"
+    "\n/help - Get some help," 
+    "\n/register <account-link> - Register your RR account,"
+    "\n/deposit <amount> - Deposits B$ to registered account,"
+    "\n/withdraw <amount> - Withdraws B$ from your account and sends it as RR money to your RR account,"
+    "\n/balance - Shows how much B$ you have in your account.")
