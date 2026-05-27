@@ -17,3 +17,9 @@ def help(msg):
     "\n/deposit <amount> - Deposits B$ to registered account,"
     "\n/withdraw <amount> - Withdraws B$ from your account and sends it as RR money to your RR account,"
     "\n/balance - Shows how much B$ you have in your account.")
+
+while True:
+    try:
+        bot.infinity_polling()
+    except Exception as e:
+        print(f"Error: {e}")
