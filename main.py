@@ -61,6 +61,9 @@ def register(msg):
     if userdict.get(str(msg.chat.id), {}).get("account_link") is not None:
         bot.send_message(msg.chat.id, "You have already registered an account link. To update it, please contact support.")
         return
+    if not account_link.startswith("https://rivalregions.com") and not account_link.startswith("https://rivalka.ru"):
+        bot.send_message(msg.chat.id, "Invalid account link. It should start with 'https://rivalregions.com' or 'https://rivalka.ru'. Please try again.")
+        return
 
     uid = ensure_user_entry(msg.chat.id)
     userdict[uid]["account_link"] = account_link
@@ -73,7 +76,7 @@ def deposit(msg):
     parts = msg.text.split(' ', 1)
     amount = parts[1].strip() if len(parts) > 1 else None
 
-    if amount and amount.isdigit():
+    if amount and amount.isdigit() and userdict.get(str(msg.chat.id), {}).get("account_link") is not None:
         uid = ensure_user_entry(msg.chat.id)
         userdict[uid]["balance"] = userdict.get(uid, {}).get("balance", 0) + int(amount)
         bot.send_message(msg.chat.id, f"Deposited {amount} B$ to your account successfully!")
@@ -89,7 +92,7 @@ def withdraw(msg):
     parts = msg.text.split(' ', 1)
     amount = parts[1].strip() if len(parts) > 1 else None
 
-    if amount and amount.isdigit():
+    if amount and amount.isdigit() and userdict.get(str(msg.chat.id), {}).get("account_link") is not None:
         uid = ensure_user_entry(msg.chat.id)
         amt = int(amount)
         current = userdict.get(uid, {}).get("balance", 0)
