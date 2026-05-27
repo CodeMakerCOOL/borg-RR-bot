@@ -62,7 +62,7 @@ def balance(msg):
 
 while True:
     try:
-        bot.infinity_polling()
+        bot.infinity_polling(skip_pending=True)
     except Exception as e:
         print(f"Error: {e}")
     except KeyboardInterrupt:
