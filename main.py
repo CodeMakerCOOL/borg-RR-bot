@@ -1,9 +1,17 @@
 import telebot
+import json
 import os
 
 TOKEN = os.getenv('BOT_TOKEN')
 bot = telebot.TeleBot(TOKEN)
-user_dict = {}
+userdict = {}
+
+# Load user data from a JSON file if it exists
+try:
+    with open("user_data.json", "r") as f:
+        userdict = json.load(f)
+except FileNotFoundError:
+    pass
 
 @bot.message_handler(commands=['start'])
 def start(msg):
@@ -38,7 +46,7 @@ def deposit(msg):
     if amount and amount.isdigit():
         # Here you would add code to deposit the specified amount to the user's account
         bot.send_message(msg.chat.id, f"Deposited {amount} B$ to your account successfully!")
-        user_dict[msg.chat.id] = user_dict.get(msg.chat.id, 0) + int(amount)  # Update the user's balance in the dictionary
+        userdict[msg.chat.id] = userdict.get(msg.chat.id, 0) + int(amount)  # Update the user's balance in the dictionary
     else:
         bot.send_message(msg.chat.id, "Please provide a valid amount. Usage: /deposit <amount>")
 
@@ -50,15 +58,20 @@ def withdraw(msg):
     if amount and amount.isdigit():
         # Here you would add code to withdraw the specified amount from the user's account and send it as RR money
         bot.send_message(msg.chat.id, f"Withdrew {amount} B$ from your account and sent it as RR money successfully!")
-        user_dict[msg.chat.id] = user_dict.get(msg.chat.id, 0) - int(amount)  # Update the user's balance in the dictionary
+        userdict[msg.chat.id] = userdict.get(msg.chat.id, 0) - int(amount)  # Update the user's balance in the dictionary
     else:
         bot.send_message(msg.chat.id, "Please provide a valid amount. Usage: /withdraw <amount>")
 
 @bot.message_handler(commands=['balance'])
 def balance(msg):
     # Here you would add code to retrieve the user's account balance
-    balance = user_dict.get(msg.chat.id, 0)
+    balance = userdict.get(msg.chat.id, 0)
     bot.send_message(msg.chat.id, f"Your current balance is: {balance} B$")
+
+# Save user data to a JSON file periodically
+def save_user_data():
+    with open("user_data.json", "w") as f:
+        json.dump(userdict, f)
 
 while True:
     try:
@@ -67,4 +80,5 @@ while True:
         print(f"Error: {e}")
     except KeyboardInterrupt:
         print("Bot stopped by user.")
+        save_user_data()
         break
