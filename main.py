@@ -82,3 +82,4 @@ while True:
         print("Bot stopped by user.")
         save_user_data()
         break
+quit()
