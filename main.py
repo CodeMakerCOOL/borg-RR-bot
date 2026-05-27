@@ -8,7 +8,7 @@ userdict = {}
 
 # Load user data from a JSON file if it exists
 try:
-    with open("user_data.json", "r") as f:
+    with open(os.path.join(os.path.dirname(__file__), "user_data.json"), "r") as f:
         userdict = json.load(f)
 except FileNotFoundError:
     pass
@@ -16,6 +16,7 @@ except FileNotFoundError:
 @bot.message_handler(commands=['start'])
 def start(msg):
     bot.send_message(msg.chat.id, "Hello i am Dorg, i will help you to use Borg's services such as investing RR stocks and RR business, to start please type /help.")
+    userdict[msg.chat.id] = {"balance": 0, "account_link": None}  # Initialize user data in the dictionary
 
 @bot.message_handler(commands=['help'])
 def help(msg):
@@ -32,9 +33,10 @@ def register(msg):
     # Extract the account link from the message
     account_link = msg.text.split(' ', 1)[1] if len(msg.text.split(' ', 1)) > 1 else None
     
-    if account_link:
+    if account_link and userdict.get(msg.chat.id, {}).get("account_link") is None:
         # Here you would add code to register the account link with the user's Telegram ID
         bot.send_message(msg.chat.id, f"Account link '{account_link}' registered successfully!")
+        userdict[msg.chat.id]["account_link"] = account_link  # Update the user's account
     else:
         bot.send_message(msg.chat.id, "Please provide an account link. Usage: /register <account-link>")
 
@@ -46,7 +48,7 @@ def deposit(msg):
     if amount and amount.isdigit():
         # Here you would add code to deposit the specified amount to the user's account
         bot.send_message(msg.chat.id, f"Deposited {amount} B$ to your account successfully!")
-        userdict[msg.chat.id] = userdict.get(msg.chat.id, 0) + int(amount)  # Update the user's balance in the dictionary
+        userdict[msg.chat.id]["balance"] = userdict.get(msg.chat.id, {}).get("balance", 0) + int(amount)  # Update the user's balance in the dictionary
     else:
         bot.send_message(msg.chat.id, "Please provide a valid amount. Usage: /deposit <amount>")
 
@@ -58,19 +60,19 @@ def withdraw(msg):
     if amount and amount.isdigit():
         # Here you would add code to withdraw the specified amount from the user's account and send it as RR money
         bot.send_message(msg.chat.id, f"Withdrew {amount} B$ from your account and sent it as RR money successfully!")
-        userdict[msg.chat.id] = userdict.get(msg.chat.id, 0) - int(amount)  # Update the user's balance in the dictionary
+        userdict[msg.chat.id]["balance"] = userdict.get(msg.chat.id, {}).get("balance", 0) - int(amount)  # Update the user's balance in the dictionary
     else:
         bot.send_message(msg.chat.id, "Please provide a valid amount. Usage: /withdraw <amount>")
 
 @bot.message_handler(commands=['balance'])
 def balance(msg):
     # Here you would add code to retrieve the user's account balance
-    balance = userdict.get(msg.chat.id, 0)
+    balance = userdict.get(msg.chat.id, {}).get("balance", 0)
     bot.send_message(msg.chat.id, f"Your current balance is: {balance} B$")
 
 # Save user data to a JSON file periodically
 def save_user_data():
-    with open("user_data.json", "w") as f:
+    with open(os.path.join(os.path.dirname(__file__), "user_data.json"), "w") as f:
         json.dump(userdict, f)
 
 while True:
